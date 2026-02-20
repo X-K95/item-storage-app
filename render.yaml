@@ -1,0 +1,46 @@
+# Render部署配置文件
+
+# 后端服务配置
+name: item-storage-backend
+env: node
+buildCommand: npm install
+startCommand: node server.js
+envVars:
+  - key: NODE_ENV
+    value: production
+  - key: MONGODB_URI
+    fromDatabase:
+      name: item-storage-db
+      property: connectionString
+
+# 数据库配置
+databases:
+  - name: item-storage-db
+    databaseName: itemStorage
+    user: item-storage-user
+    plan: starter
+
+# 前端服务配置
+name: item-storage-frontend
+env: static
+buildCommand: npm run build
+publishDir: build
+envVars:
+  - key: REACT_APP_API_URL
+    value: https://item-storage-backend.onrender.com/api
+
+# 网络配置
+networks:
+  - name: item-storage-network
+    type: private
+
+# 域名配置
+domains:
+  - name: item-storage-app.com
+    service: item-storage-frontend
+
+# SSL证书配置
+ssl:
+  - name: item-storage-app.com
+    service: item-storage-frontend
+    type: letsencrypt
